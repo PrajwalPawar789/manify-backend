@@ -21,8 +21,9 @@ router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.post('/fetchLeads', userController.fetchLeads);
 router.post('/fetchLeads1', userController.fetchLeads1);
+router.post('/fetchLeads2', userController.fetchLeads2);
 router.get('/search',authenticateToken, userController.search);
-router.get('/prospectDetails/:uuid', userController.fetchProspectDetails);
+router.get('/prospectDetails/:sr_no', userController.fetchProspectDetails);
 router.get('/userPlanDetails/:userId', userController.fetchUserPlanDetails);
 
 module.exports = router;

@@ -4,12 +4,12 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5030;
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:3030',
   credentials: true
 }));
 
