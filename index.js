@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5030;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:3030',
+  origin: 'http://192.168.1.36:3030',
   credentials: true
 }));
 
