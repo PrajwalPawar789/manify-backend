@@ -47,13 +47,13 @@ async function login(req, res) {
 async function logout(req, res) {
     try {
         // Retrieve user id from JWT token
-        const token = req.cookies.jwt;
-        const decoded = jwt.verify(token, secretKey);
-        const userId = decoded.userid; // Assuming userid is the user identifier
-        const currentTime = new Date().toISOString();
+        // const token = req.cookies.jwt;
+        // const decoded = jwt.verify(token, secretKey);
+        // const userId = decoded.userid; // Assuming userid is the user identifier
+        // const currentTime = new Date().toISOString();
         // Update last_logout time in user history
         // await pool.query('UPDATE userhistory SET lastlogout = $1 WHERE userid = $2', [currentTime, userId]);
-        res.clearCookie('jwt');
+        // res.clearCookie('jwt');
         res.json({ success: true, message: 'Logout successful' });
     } catch (error) {
         console.error('Error logging out:', error);
