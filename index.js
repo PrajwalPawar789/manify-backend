@@ -12,7 +12,7 @@ app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://192.168.1.36:3030',
+  origin: ['http://192.168.1.36:3030', 'http://localhost:3000'],
   credentials: true
 }));
 
