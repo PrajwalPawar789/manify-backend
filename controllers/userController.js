@@ -146,7 +146,7 @@ if (selectedFunctions && selectedFunctions.length > 0) {
     if (selectedTitles4 && selectedTitles4.length > 0) {
       // Add fuzzy match patterns to queryParams
       queryParams.push(...selectedTitles4.map(title => `%${title}%`));
-      console.log("Excluding fuzzy match inside query")
+      // console.log("Excluding fuzzy match inside query")
       // Build the query with NOT ILIKE for each pattern
       query += ` AND (${selectedTitles4.map((_, i) => `job_title NOT ILIKE $${queryParams.length - selectedTitles4.length + i + 1}`).join(" AND ")})`;
     }
@@ -198,8 +198,8 @@ if (selectedRegion && selectedRegion.length > 0) {
   
   
     // Before executing the query
-console.log("Executing SQL query:", query);
-console.log("With parameters:", queryParams);
+// console.log("Executing SQL query:", query);
+// console.log("With parameters:", queryParams);
 
 try {
   const { rows } = await pool.query(query, queryParams);
@@ -290,7 +290,7 @@ query += ` AND (${selectedTitles3.map((_, i) => `job_title ILIKE $${queryParams.
   if (selectedTitles4 && selectedTitles4.length > 0) {
     // Add fuzzy match patterns to queryParams
     queryParams.push(...selectedTitles4.map(title => `%${title}%`));
-    console.log("Excluding fuzzy match inside query")
+    // console.log("Excluding fuzzy match inside query")
     // Build the query with NOT ILIKE for each pattern
     query += ` AND (${selectedTitles4.map((_, i) => `job_title NOT ILIKE $${queryParams.length - selectedTitles4.length + i + 1}`).join(" AND ")})`;
   }
@@ -344,8 +344,8 @@ if (selectedCity) {
 query += ' LIMIT 1000';
 
   // Before executing the query
-console.log("Executing SQL query:", query);
-console.log("With parameters:", queryParams);
+// console.log("Executing SQL query:", query);
+// console.log("With parameters:", queryParams);
 
 try {
   const { rows } = await pool.query(query, queryParams);
@@ -364,7 +364,7 @@ res.status(500).json({ success: false, message: 'Internal server error in fetchi
 }
 
 async function fetchLeads1(req, res) {
-  console.log("Inside FetchLead 1");
+  // console.log("Inside FetchLead 1");
   // Extract all filters from request body, including new location filters
   const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, company_name, selectedCountry, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
 
@@ -435,7 +435,7 @@ query += ` AND (${selectedTitles3.map((_, i) => `job_title ILIKE $${queryParams.
   if (selectedTitles4 && selectedTitles4.length > 0) {
     // Add fuzzy match patterns to queryParams
     queryParams.push(...selectedTitles4.map(title => `%${title}%`));
-    console.log("Excluding fuzzy match inside query")
+    // console.log("Excluding fuzzy match inside query")
     // Build the query with NOT ILIKE for each pattern
     query += ` AND (${selectedTitles4.map((_, i) => `job_title NOT ILIKE $${queryParams.length - selectedTitles4.length + i + 1}`).join(" AND ")})`;
   }
@@ -479,8 +479,8 @@ if (selectedCity) {
 
 
   // Before executing the query
-console.log("Executing SQL query:", query);
-console.log("With parameters:", queryParams);
+// console.log("Executing SQL query:", query);
+// console.log("With parameters:", queryParams);
 
 try {
 const { rows } = await pool.query(query, queryParams);
@@ -504,7 +504,7 @@ function decryptString(encryptedText) {
 
 async function fetchProspectDetails(req, res) {
   const { sr_no } = req.params;
-console.log("Inside FetchProspect")
+// console.log("Inside FetchProspect")
   try {
       const { rows } = await pool.query(`SELECT * FROM public.inhouse_final WHERE sr_no = $1`, [sr_no]);
       if (rows.length > 0) {
