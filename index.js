@@ -12,7 +12,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use(cookieParser());
 app.use(cors({
-  origin: '192.168.1.36',
+  origin: 'http://192.168.1.36:3030',
   credentials: true
 }));
 
