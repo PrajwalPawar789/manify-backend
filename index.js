@@ -7,8 +7,8 @@ const app = express();
 const PORT = process.env.PORT || 5030;
 
 // Increase the payload size limit to 50MB for JSON and URL-encoded bodies
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 app.use(cookieParser());
 app.use(cors({
