@@ -366,7 +366,7 @@ res.status(500).json({ success: false, message: 'Internal server error in fetchi
 async function fetchLeads1(req, res) {
   // console.log("Inside FetchLead 1");
   // Extract all filters from request body, including new location filters
-  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, company_name, selectedCountry, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
+  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
 
   // Base query setup
   let query = `SELECT * FROM public.inhouse_final WHERE 1=1`;
@@ -465,6 +465,14 @@ if (selectedCountry && selectedCountry.length > 0) {
 
   // Construct the SQL query with dynamic placeholders
   query += ` AND country IN (${selectedCountry.map((_, i) => `$${queryParams.length - selectedCountry.length + i + 1}`).join(", ")})`;
+}
+
+if (selectedRegion && selectedRegion.length > 0) {
+  // Add the selectedCountry array to queryParams
+  queryParams.push(...selectedRegion);
+
+  // Construct the SQL query with dynamic placeholders
+  query += ` AND region IN (${selectedRegion.map((_, i) => `$${queryParams.length - selectedRegion.length + i + 1}`).join(", ")})`;
 }
 
 if (selectedState) {
