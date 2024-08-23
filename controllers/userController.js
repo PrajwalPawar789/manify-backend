@@ -100,113 +100,99 @@ async function fetchLeads(req, res) {
   const queryParams = [];
   let paramIndex = 1;
 
-  // Filter by included companies
   if (selectedIncludedCompanies && selectedIncludedCompanies.length > 0) {
     query += ` AND (${selectedIncludedCompanies.map(_ => `company_name = $${paramIndex++}`).join(" OR ")})`;
     queryParams.push(...selectedIncludedCompanies);
   }
 
-  // Exclude specific companies
   if (selectedExcludedCompanies && selectedExcludedCompanies.length > 0) {
     query += ` AND (${selectedExcludedCompanies.map(_ => `company_name != $${paramIndex++}`).join(" AND ")})`;
     queryParams.push(...selectedExcludedCompanies);
   }
 
-  // Filter by included domains
   if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
     query += ` AND (${selectedIncludedCompanies3.map(_ => `domain = $${paramIndex++}`).join(" OR ")})`;
     queryParams.push(...selectedIncludedCompanies3);
   }
 
-  // Exclude specific domains
   if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
     query += ` AND (${selectedIncludedCompanies4.map(_ => `domain != $${paramIndex++}`).join(" AND ")})`;
     queryParams.push(...selectedIncludedCompanies4);
   }
 
-  // Filter by industries
   if (selectedIndustries && selectedIndustries.length > 0) {
     query += ` AND industry_type IN (${selectedIndustries.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedIndustries);
   }
 
-  // Filter by sub-industries
   if (selectedSubIndustries && selectedSubIndustries.length > 0) {
     query += ` AND sub_industry IN (${selectedSubIndustries.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedSubIndustries);
   }
 
-  // Filter by functions
   if (selectedFunctions && selectedFunctions.length > 0) {
     query += ` AND job_function IN (${selectedFunctions.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedFunctions);
   }
 
-  // Filter by job titles
   if (selectedTitles && selectedTitles.length > 0) {
     query += ` AND job_title IN (${selectedTitles.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedTitles);
   }
 
-  // Exclude specific job titles
   if (selectedTitles1 && selectedTitles1.length > 0) {
     query += ` AND job_title NOT IN (${selectedTitles1.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedTitles1);
   }
 
-  // Fuzzy match on job titles
   if (selectedTitles3 && selectedTitles3.length > 0) {
     query += ` AND (${selectedTitles3.map(_ => `job_title ILIKE $${paramIndex++}`).join(" OR ")})`;
     queryParams.push(...selectedTitles3.map(title => `%${title}%`));
   }
 
-  // Exclude fuzzy match on job titles
   if (selectedTitles4 && selectedTitles4.length > 0) {
     query += ` AND (${selectedTitles4.map(_ => `job_title NOT ILIKE $${paramIndex++}`).join(" AND ")})`;
     queryParams.push(...selectedTitles4.map(title => `%${title}%`));
   }
 
-  // Filter by job levels
   if (selectedLevels && selectedLevels.length > 0) {
     query += ` AND job_level IN (${selectedLevels.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedLevels);
   }
 
-  // Filter by employee size
   if (selectedSizes && selectedSizes.length > 0) {
     query += ` AND employee_size IN (${selectedSizes.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedSizes);
   }
 
-  // Filter by company name
   if (company_name) {
     query += ` AND company_name ILIKE $${paramIndex++}`;
     queryParams.push(`%${company_name.trim()}%`);
   }
 
-  // Filter by country
   if (selectedCountry && selectedCountry.length > 0) {
     query += ` AND country IN (${selectedCountry.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedCountry);
   }
 
-  // Filter by region
   if (selectedRegion && selectedRegion.length > 0) {
     query += ` AND region IN (${selectedRegion.map(_ => `$${paramIndex++}`).join(", ")})`;
     queryParams.push(...selectedRegion);
   }
 
-  // Filter by state
   if (selectedState) {
     query += ` AND state = $${paramIndex++}`;
     queryParams.push(selectedState);
   }
 
-  // Filter by city
   if (selectedCity) {
     query += ` AND city = $${paramIndex++}`;
     queryParams.push(selectedCity);
   }
+
+  // Debug logs
+  console.log('Generated Query:', query);
+  console.log('Query Parameters:', queryParams);
 
   try {
     const { rows } = await pool.query(query, queryParams);
