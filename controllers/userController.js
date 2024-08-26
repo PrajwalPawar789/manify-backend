@@ -70,7 +70,6 @@ async function search(req, res) {
     }
 }
 
-
 let currentAbortController = null; // Keep track of the current AbortController
 
 async function fetchLeads(req, res) {
@@ -83,134 +82,167 @@ async function fetchLeads(req, res) {
   const abortController = new AbortController();
   currentAbortController = abortController;
 
-  // Extract all filters from request body
   const {
-    selectedIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4,
-    selectedLevels, selectedFunctions, selectedSizes, companyName,
-    selectedCountry, selectedState, selectedCity, selectedIncludedCompanies,
-    selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4
+    selectedIndustries,
+    selectedSubIndustries,
+    selectedTitles,
+    selectedTitles1,
+    selectedTitles3,
+    selectedTitles4,
+    selectedLevels,
+    selectedFunctions,
+    selectedSizes,
+    company_name,
+    selectedCountry,
+    selectedRegion,
+    selectedState,
+    selectedCity,
+    selectedIncludedCompanies,
+    selectedExcludedCompanies,
+    selectedIncludedCompanies3,
+    selectedIncludedCompanies4
   } = req.body;
 
-  // Base query setup
-  let query = `SELECT firstname || ' ' || lastname AS contactname, jobtitle, companyname, industrytype, uuid 
-               FROM public.prospects WHERE 1=1`;
+  let query = `
+    SELECT COUNT(*) AS total_contacts, COUNT(DISTINCT company_name) AS total_companies
+    FROM public.inhouse_final
+    WHERE 1=1`;
+
   const queryParams = [];
+  let paramIndex = 1;
 
   // Filter by included companies
   if (selectedIncludedCompanies && selectedIncludedCompanies.length > 0) {
+    query += ` AND (${selectedIncludedCompanies.map((_, idx) => `company_name = $${paramIndex + idx}`).join(" OR ")})`;
     queryParams.push(...selectedIncludedCompanies);
-    query += ` AND (${selectedIncludedCompanies.map((_, i) => `companyname = $${i + 1}`).join(" OR ")})`;
+    paramIndex += selectedIncludedCompanies.length;
   }
 
   // Exclude specific companies
   if (selectedExcludedCompanies && selectedExcludedCompanies.length > 0) {
+    query += ` AND (${selectedExcludedCompanies.map((_, idx) => `company_name != $${paramIndex + idx}`).join(" AND ")})`;
     queryParams.push(...selectedExcludedCompanies);
-    query += ` AND (${selectedExcludedCompanies.map((_, i) => `companyname != $${queryParams.length - selectedExcludedCompanies.length + i + 1}`).join(" AND ")})`;
+    paramIndex += selectedExcludedCompanies.length;
   }
 
   // Filter by included domains
   if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
+    query += ` AND (${selectedIncludedCompanies3.map((_, idx) => `domain = $${paramIndex + idx}`).join(" OR ")})`;
     queryParams.push(...selectedIncludedCompanies3);
-    query += ` AND (${selectedIncludedCompanies3.map((_, i) => `domain = $${queryParams.length - selectedIncludedCompanies3.length + i + 1}`).join(" OR ")})`;
+    paramIndex += selectedIncludedCompanies3.length;
   }
 
   // Exclude specific domains
   if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
+    query += ` AND (${selectedIncludedCompanies4.map((_, idx) => `domain != $${paramIndex + idx}`).join(" AND ")})`;
     queryParams.push(...selectedIncludedCompanies4);
-    query += ` AND (${selectedIncludedCompanies4.map((_, i) => `domain != $${queryParams.length - selectedIncludedCompanies4.length + i + 1}`).join(" AND ")})`;
+    paramIndex += selectedIncludedCompanies4.length;
   }
 
   // Filter by industries
   if (selectedIndustries && selectedIndustries.length > 0) {
+    query += ` AND industry_type IN (${selectedIndustries.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedIndustries);
-    query += ` AND industrytype IN (${selectedIndustries.map((_, i) => `$${queryParams.length - selectedIndustries.length + i + 1}`).join(", ")})`;
+    paramIndex += selectedIndustries.length;
+  }
+
+  // Filter by sub-industries
+  if (selectedSubIndustries && selectedSubIndustries.length > 0) {
+    query += ` AND sub_industry IN (${selectedSubIndustries.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+    queryParams.push(...selectedSubIndustries);
+    paramIndex += selectedSubIndustries.length;
   }
 
   // Filter by functions
   if (selectedFunctions && selectedFunctions.length > 0) {
+    query += ` AND job_function IN (${selectedFunctions.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedFunctions);
-    query += ` AND jobfunction IN (${selectedFunctions.map((_, i) => `$${queryParams.length - selectedFunctions.length + i + 1}`).join(", ")})`;
+    paramIndex += selectedFunctions.length;
   }
 
   // Filter by job titles
   if (selectedTitles && selectedTitles.length > 0) {
+    query += ` AND job_title IN (${selectedTitles.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedTitles);
-    query += ` AND jobtitle IN (${selectedTitles.map((_, i) => `$${queryParams.length - selectedTitles.length + i + 1}`).join(", ")})`;
+    paramIndex += selectedTitles.length;
   }
 
   // Exclude specific job titles
   if (selectedTitles1 && selectedTitles1.length > 0) {
+    query += ` AND job_title NOT IN (${selectedTitles1.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedTitles1);
-    query += ` AND jobtitle NOT IN (${selectedTitles1.map((_, i) => `$${queryParams.length - selectedTitles1.length + i + 1}`).join(", ")})`;
+    paramIndex += selectedTitles1.length;
   }
 
-  // Filter by job titles with fuzzy match
+  // Fuzzy match on job titles
   if (selectedTitles3 && selectedTitles3.length > 0) {
+    query += ` AND (${selectedTitles3.map((_, idx) => `job_title ILIKE $${paramIndex + idx}`).join(" OR ")})`;
     queryParams.push(...selectedTitles3.map(title => `%${title}%`));
-    query += ` AND (${selectedTitles3.map((_, i) => `jobtitle ILIKE $${queryParams.length - selectedTitles3.length + i + 1}`).join(" OR ")})`;
+    paramIndex += selectedTitles3.length;
   }
 
-  // Exclude job titles with fuzzy match
+  // Exclude fuzzy match on job titles
   if (selectedTitles4 && selectedTitles4.length > 0) {
+    query += ` AND (${selectedTitles4.map((_, idx) => `job_title NOT ILIKE $${paramIndex + idx}`).join(" AND ")})`;
     queryParams.push(...selectedTitles4.map(title => `%${title}%`));
-    query += ` AND (${selectedTitles4.map((_, i) => `jobtitle NOT ILIKE $${queryParams.length - selectedTitles4.length + i + 1}`).join(" AND ")})`;
+    paramIndex += selectedTitles4.length;
   }
 
   // Filter by job levels
   if (selectedLevels && selectedLevels.length > 0) {
+    query += ` AND job_level IN (${selectedLevels.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedLevels);
-    query += ` AND joblevel IN (${selectedLevels.map((_, i) => `$${queryParams.length - selectedLevels.length + i + 1}`).join(", ")})`;
+    paramIndex += selectedLevels.length;
   }
 
   // Filter by employee size
   if (selectedSizes && selectedSizes.length > 0) {
+    query += ` AND employee_size IN (${selectedSizes.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedSizes);
-    query += ` AND employeesize IN (${selectedSizes.map((_, i) => `$${queryParams.length - selectedSizes.length + i + 1}`).join(", ")})`;
+    paramIndex += selectedSizes.length;
   }
 
   // Filter by company name
-  if (companyName) {
-    queryParams.push(`%${companyName.trim()}%`);
-    query += ` AND companyname ILIKE $${queryParams.length}`; // ILIKE for case-insensitive matching
+  if (company_name) {
+    query += ` AND company_name ILIKE $${paramIndex++}`;
+    queryParams.push(`%${company_name.trim()}%`);
   }
 
   // Filter by country
   if (selectedCountry && selectedCountry.length > 0) {
+    query += ` AND country IN (${selectedCountry.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedCountry);
-    query += ` AND country IN (${selectedCountry.map((_, i) => `$${queryParams.length - selectedCountry.length + i + 1}`).join(", ")})`;
+    paramIndex += selectedCountry.length;
+  }
+
+  // Filter by region
+  if (selectedRegion && selectedRegion.length > 0) {
+    query += ` AND region IN (${selectedRegion.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+    queryParams.push(...selectedRegion);
+    paramIndex += selectedRegion.length;
   }
 
   // Filter by state
   if (selectedState) {
+    query += ` AND state = $${paramIndex++}`;
     queryParams.push(selectedState);
-    query += ` AND state = $${queryParams.length}`;
   }
 
   // Filter by city
   if (selectedCity) {
+    query += ` AND city = $${paramIndex++}`;
     queryParams.push(selectedCity);
-    query += ` AND city = $${queryParams.length}`;
   }
 
-  // Log the query before execution
-  console.log("Executing SQL query:", query);
-  console.log("With parameters:", queryParams);
-
   try {
-    const result = await pool.query(query, queryParams, {
+    const { rows } = await pool.query(query, queryParams, {
       signal: abortController.signal // Pass the AbortSignal to the query
     });
-
-    const rows = result.rows || []; // Ensure rows is an array
-
     res.json({
       success: true,
       data: rows.map(row => ({
-        contactName: row.contactname,
-        jobTitle: row.jobtitle,
-        companyName: row.companyname,
-        industry: row.industrytype,
-        uuid: row.uuid
+        totalContacts: row.total_contacts,
+        totalCompanies: row.total_companies
       }))
     });
   } catch (error) {
