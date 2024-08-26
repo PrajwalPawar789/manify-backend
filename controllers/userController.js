@@ -70,18 +70,7 @@ async function search(req, res) {
     }
 }
 
-let currentAbortController = null; // Keep track of the current AbortController
-
 async function fetchLeads(req, res) {
-  // Abort any previous queries
-  if (currentAbortController) {
-    currentAbortController.abort();
-  }
-
-  // Create a new AbortController for the current request
-  const abortController = new AbortController();
-  currentAbortController = abortController;
-
   const {
     selectedIndustries,
     selectedSubIndustries,
@@ -235,9 +224,7 @@ async function fetchLeads(req, res) {
   }
 
   try {
-    const { rows } = await pool.query(query, queryParams, {
-      signal: abortController.signal // Pass the AbortSignal to the query
-    });
+    const { rows } = await pool.query(query, queryParams);
     res.json({
       success: true,
       data: rows.map(row => ({
@@ -246,17 +233,11 @@ async function fetchLeads(req, res) {
       }))
     });
   } catch (error) {
-    if (error.name === 'AbortError') {
-      console.log('Query aborted:', error.message);
-      res.status(499).json({ success: false, message: 'Query aborted' });
-    } else {
-      console.error('Error fetching leads:', error);
-      res.status(500).json({ success: false, message: 'Internal server error in fetching leads' });
-    }
-  } finally {
-    currentAbortController = null; // Reset the AbortController after completion
+    console.error('Error fetching leads:', error);
+    res.status(500).json({ success: false, message: 'Internal server error in fetching leads' });
   }
 }
+
 
 async function fetchLeads2(req, res) {
   // Extract all filters from request body, including new location filters
