@@ -70,6 +70,7 @@ async function search(req, res) {
     }
 }
 
+
 let currentAbortController = null; // Keep track of the current AbortController
 
 async function fetchLeads(req, res) {
@@ -196,9 +197,11 @@ async function fetchLeads(req, res) {
   console.log("With parameters:", queryParams);
 
   try {
-    const { rows } = await pool.query(query, queryParams, {
+    const result = await pool.query(query, queryParams, {
       signal: abortController.signal // Pass the AbortSignal to the query
     });
+
+    const rows = result.rows || []; // Ensure rows is an array
 
     res.json({
       success: true,
