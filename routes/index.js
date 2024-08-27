@@ -23,6 +23,8 @@ router.post('/fetchLeads', userController.fetchLeads);
 router.post('/fetchLeads1', userController.fetchLeads1);
 router.post('/fetchLeads2', userController.fetchLeads2);
 router.get('/search', userController.search);
+router.get('/databasecount', userController.databasecount);
+
 router.get('/prospectDetails/:sr_no', userController.fetchProspectDetails);
 router.get('/userPlanDetails/:userId', userController.fetchUserPlanDetails);
 
