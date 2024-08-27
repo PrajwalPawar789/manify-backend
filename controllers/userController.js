@@ -72,6 +72,7 @@ async function search(req, res) {
 
 let currentAbortController = null;
 
+
 async function fetchLeads(req, res) {
   // Abort any previous queries
   if (currentAbortController) {
@@ -264,7 +265,6 @@ async function fetchLeads(req, res) {
     currentAbortController = null; // Reset the AbortController after completion
   }
 }
-
 
 
 async function fetchLeads2(req, res) {
