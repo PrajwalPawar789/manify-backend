@@ -48,7 +48,10 @@ async function databasecount(req, res) {
   // Check credentials using PostgreSQL (replace with your authentication logic)
   try {
        const result = await pool.query('SELECT COUNT(*) AS total_contacts, COUNT(DISTINCT company_name) AS total_companies FROM public.inhouse_final');
-      res.send(result);
+      res.json({ success: true, data: result.map(row => ({
+        totalContacts: row.total_contacts,
+        totalCompanies: row.total_companies
+      })) });
 
   } catch (error) {
       console.error('Error fetching count:', error);
