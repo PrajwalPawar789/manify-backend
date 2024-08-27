@@ -44,6 +44,18 @@ async function login(req, res) {
     }
 }
 
+async function databasecount(req, res) {
+  // Check credentials using PostgreSQL (replace with your authentication logic)
+  try {
+      const result = await pool.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
+      res.send(result);
+
+  } catch (error) {
+      console.error('Error fetching count:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+}
+
 async function logout(req, res) {
     try {
         // Retrieve user id from JWT token
@@ -576,4 +588,4 @@ async function fetchUserPlanDetails(req, res) {
     }
 }
   
-module.exports = { login, logout, search, fetchLeads, fetchLeads1, fetchLeads2, fetchProspectDetails ,fetchUserPlanDetails   };
+module.exports = { login, databasecount, logout, search, fetchLeads, fetchLeads1, fetchLeads2, fetchProspectDetails ,fetchUserPlanDetails   };
