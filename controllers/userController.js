@@ -47,7 +47,7 @@ async function login(req, res) {
 async function databasecount(req, res) {
   // Check credentials using PostgreSQL (replace with your authentication logic)
   try {
-      const result = await pool.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
+       const result = await pool.query('SELECT COUNT(*) AS total_contacts, COUNT(DISTINCT company_name) AS total_companies FROM public.inhouse_final');
       res.send(result);
 
   } catch (error) {
