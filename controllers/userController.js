@@ -46,17 +46,24 @@ async function login(req, res) {
 
 async function databasecount(req, res) {
   // Check credentials using PostgreSQL (replace with your authentication logic)
-  try {
-       const result = await pool.query('SELECT COUNT(*) AS total_contacts, COUNT(DISTINCT company_name) AS total_companies FROM public.inhouse_final');
-      res.json({ success: true, data: result.map(row => ({
-        totalContacts: row.total_contacts,
-        totalCompanies: row.total_companies
-      })) });
 
-  } catch (error) {
-      console.error('Error fetching count:', error);
-      res.status(500).json({ success: false, message: 'Internal server error' });
-  }
+    try {
+    const result = await pool.query('SELECT COUNT(*) AS total_contacts, COUNT(DISTINCT company_name) AS total_companies FROM public.inhouse_final');
+    
+    // Assuming result.rows[0] contains the data you want
+    const row = result.rows[0];
+    res.json({
+        success: true,
+        data: {
+            totalContacts: parseInt(row.total_contacts, 10),
+            totalCompanies: parseInt(row.total_companies, 10)
+        }
+    });
+} catch (error) {
+    console.error('Error fetching count:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+}
+
 }
 
 async function logout(req, res) {
