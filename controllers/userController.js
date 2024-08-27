@@ -83,24 +83,24 @@ async function fetchLeads(req, res) {
   currentAbortController = abortController;
 
   const {
-    selectedIndustries,
-    selectedSubIndustries,
-    selectedTitles,
-    selectedTitles1,
-    selectedTitles3,
-    selectedTitles4,
-    selectedLevels,
-    selectedFunctions,
-    selectedSizes,
-    company_name,
-    selectedCountry,
-    selectedRegion,
-    selectedState,
-    selectedCity,
-    selectedIncludedCompanies,
-    selectedExcludedCompanies,
-    selectedIncludedCompanies3,
-    selectedIncludedCompanies4,
+    selectedIndustries = [],
+    selectedSubIndustries = [],
+    selectedTitles = [],
+    selectedTitles1 = [],
+    selectedTitles3 = [],
+    selectedTitles4 = [],
+    selectedLevels = [],
+    selectedFunctions = [],
+    selectedSizes = [],
+    company_name = '',
+    selectedCountry = [],
+    selectedRegion = [],
+    selectedState = '',
+    selectedCity = '',
+    selectedIncludedCompanies = [],
+    selectedExcludedCompanies = [],
+    selectedIncludedCompanies3 = [],
+    selectedIncludedCompanies4 = [],
   } = req.body;
 
   let query = `
@@ -112,126 +112,126 @@ async function fetchLeads(req, res) {
   let paramIndex = 1;
 
   // Filter by included companies
-  if (selectedIncludedCompanies && selectedIncludedCompanies.length > 0) {
+  if (selectedIncludedCompanies.length > 0) {
     query += ` AND (${selectedIncludedCompanies.map((_, idx) => `company_name = $${paramIndex + idx}`).join(" OR ")})`;
     queryParams.push(...selectedIncludedCompanies);
     paramIndex += selectedIncludedCompanies.length;
   }
 
   // Exclude specific companies
-  if (selectedExcludedCompanies && selectedExcludedCompanies.length > 0) {
+  if (selectedExcludedCompanies.length > 0) {
     query += ` AND (${selectedExcludedCompanies.map((_, idx) => `company_name != $${paramIndex + idx}`).join(" AND ")})`;
     queryParams.push(...selectedExcludedCompanies);
     paramIndex += selectedExcludedCompanies.length;
   }
 
   // Filter by included domains
-  if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
+  if (selectedIncludedCompanies3.length > 0) {
     query += ` AND (${selectedIncludedCompanies3.map((_, idx) => `domain = $${paramIndex + idx}`).join(" OR ")})`;
     queryParams.push(...selectedIncludedCompanies3);
     paramIndex += selectedIncludedCompanies3.length;
   }
 
   // Exclude specific domains
-  if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
+  if (selectedIncludedCompanies4.length > 0) {
     query += ` AND (${selectedIncludedCompanies4.map((_, idx) => `domain != $${paramIndex + idx}`).join(" AND ")})`;
     queryParams.push(...selectedIncludedCompanies4);
     paramIndex += selectedIncludedCompanies4.length;
   }
 
   // Filter by industries
-  if (selectedIndustries && selectedIndustries.length > 0) {
+  if (selectedIndustries.length > 0) {
     query += ` AND industry_type IN (${selectedIndustries.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedIndustries);
     paramIndex += selectedIndustries.length;
   }
 
   // Filter by sub-industries
-  if (selectedSubIndustries && selectedSubIndustries.length > 0) {
+  if (selectedSubIndustries.length > 0) {
     query += ` AND sub_industry IN (${selectedSubIndustries.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedSubIndustries);
     paramIndex += selectedSubIndustries.length;
   }
 
   // Filter by functions
-  if (selectedFunctions && selectedFunctions.length > 0) {
+  if (selectedFunctions.length > 0) {
     query += ` AND job_function IN (${selectedFunctions.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedFunctions);
     paramIndex += selectedFunctions.length;
   }
 
   // Filter by job titles
-  if (selectedTitles && selectedTitles.length > 0) {
+  if (selectedTitles.length > 0) {
     query += ` AND job_title IN (${selectedTitles.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedTitles);
     paramIndex += selectedTitles.length;
   }
 
   // Exclude specific job titles
-  if (selectedTitles1 && selectedTitles1.length > 0) {
+  if (selectedTitles1.length > 0) {
     query += ` AND job_title NOT IN (${selectedTitles1.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedTitles1);
     paramIndex += selectedTitles1.length;
   }
 
   // Fuzzy match on job titles
-  if (selectedTitles3 && selectedTitles3.length > 0) {
+  if (selectedTitles3.length > 0) {
     query += ` AND (${selectedTitles3.map((_, idx) => `job_title ILIKE $${paramIndex + idx}`).join(" OR ")})`;
     queryParams.push(...selectedTitles3.map(title => `%${title}%`));
     paramIndex += selectedTitles3.length;
   }
 
   // Exclude fuzzy match on job titles
-  if (selectedTitles4 && selectedTitles4.length > 0) {
+  if (selectedTitles4.length > 0) {
     query += ` AND (${selectedTitles4.map((_, idx) => `job_title NOT ILIKE $${paramIndex + idx}`).join(" AND ")})`;
     queryParams.push(...selectedTitles4.map(title => `%${title}%`));
     paramIndex += selectedTitles4.length;
   }
 
   // Filter by job levels
-  if (selectedLevels && selectedLevels.length > 0) {
+  if (selectedLevels.length > 0) {
     query += ` AND job_level IN (${selectedLevels.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedLevels);
     paramIndex += selectedLevels.length;
   }
 
   // Filter by employee size
-  if (selectedSizes && selectedSizes.length > 0) {
+  if (selectedSizes.length > 0) {
     query += ` AND employee_size IN (${selectedSizes.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedSizes);
     paramIndex += selectedSizes.length;
   }
 
   // Filter by company name
-  if (company_name) {
+  if (company_name.trim() !== '') {
     query += ` AND company_name ILIKE $${paramIndex++}`;
     queryParams.push(`%${company_name.trim()}%`);
   }
 
   // Filter by country
-  if (selectedCountry && selectedCountry.length > 0) {
+  if (selectedCountry.length > 0) {
     query += ` AND country IN (${selectedCountry.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedCountry);
     paramIndex += selectedCountry.length;
   }
 
   // Filter by region
-  if (selectedRegion && selectedRegion.length > 0) {
+  if (selectedRegion.length > 0) {
     query += ` AND region IN (${selectedRegion.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
     queryParams.push(...selectedRegion);
     paramIndex += selectedRegion.length;
   }
 
   // Filter by state
-  if (selectedState) {
+  if (selectedState.trim() !== '') {
     query += ` AND state = $${paramIndex++}`;
-    queryParams.push(selectedState);
+    queryParams.push(selectedState.trim());
   }
 
   // Filter by city
-  if (selectedCity) {
+  if (selectedCity.trim() !== '') {
     query += ` AND city = $${paramIndex++}`;
-    queryParams.push(selectedCity);
+    queryParams.push(selectedCity.trim());
   }
 
   try {
@@ -264,6 +264,7 @@ async function fetchLeads(req, res) {
     currentAbortController = null; // Reset the AbortController after completion
   }
 }
+
 
 
 async function fetchLeads2(req, res) {
