@@ -235,12 +235,19 @@ async function fetchLeads(req, res) {
   }
 
   try {
-    const { rows } = await pool.query(query, queryParams, {
+    // Execute the query
+    const result = await pool.query(query, queryParams, {
       signal: abortController.signal, // Pass the AbortSignal to the query
     });
+
+    // Check if rows exist in the result
+    if (!result || !result.rows) {
+      throw new Error('Query did not return any rows');
+    }
+
     res.json({
       success: true,
-      data: rows.map(row => ({
+      data: result.rows.map(row => ({
         totalContacts: row.total_contacts,
         totalCompanies: row.total_companies,
       })),
@@ -257,6 +264,7 @@ async function fetchLeads(req, res) {
     currentAbortController = null; // Reset the AbortController after completion
   }
 }
+
 
 async function fetchLeads2(req, res) {
   // Extract all filters from request body, including new location filters
