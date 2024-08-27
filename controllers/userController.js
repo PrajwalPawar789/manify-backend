@@ -115,18 +115,18 @@ async function fetchLeads(req, res) {
   }
 
   // Filter by included domains
-  if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
-    query += ` AND (${selectedIncludedCompanies3.map((_, idx) => `domain = $${paramIndex + idx}`).join(" OR ")})`;
-    queryParams.push(...selectedIncludedCompanies3);
-    paramIndex += selectedIncludedCompanies3.length;
-  }
+if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
+  query += ` AND domain IN (${selectedIncludedCompanies3.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+  queryParams.push(...selectedIncludedCompanies3);
+  paramIndex += selectedIncludedCompanies3.length;
+}
 
-  // Exclude specific domains
-  if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
-    query += ` AND (${selectedIncludedCompanies4.map((_, idx) => `domain != $${paramIndex + idx}`).join(" AND ")})`;
-    queryParams.push(...selectedIncludedCompanies4);
-    paramIndex += selectedIncludedCompanies4.length;
-  }
+// Exclude specific domains
+if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
+  query += ` AND domain NOT IN (${selectedIncludedCompanies4.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+  queryParams.push(...selectedIncludedCompanies4);
+  paramIndex += selectedIncludedCompanies4.length;
+}
 
   // Filter by industries
   if (selectedIndustries && selectedIndustries.length > 0) {
