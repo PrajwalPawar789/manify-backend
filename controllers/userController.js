@@ -103,6 +103,7 @@ async function fetchLeads(req, res) {
     selectedLevels,
     selectedFunctions,
     selectedSizes,
+    selectedTags,
     company_name,
     selectedCountry,
     selectedRegion,
@@ -213,6 +214,13 @@ if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
     paramIndex += selectedSizes.length;
   }
 
+    // Filter by employee size
+    if (selectedTags && selectedTags.length > 0) {
+      query += ` AND lead_tagging IN (${selectedTags.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+      queryParams.push(...selectedTags);
+      paramIndex += selectedTags.length;
+    }
+
   // Filter by company name
   if (company_name) {
     query += ` AND company_name ILIKE $${paramIndex++}`;
@@ -263,7 +271,7 @@ if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
 
 async function fetchLeads2(req, res) {
   // Extract all filters from request body, including new location filters
-  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
+  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, selectedTags, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
 
   // Base query setup
   let query = `
@@ -354,6 +362,12 @@ if (selectedSizes && selectedSizes.length > 0) {
   query += ` AND employee_size IN (${selectedSizes.map((_, i) => `$${queryParams.length - selectedSizes.length + i + 1}`).join(", ")})`;
 }
 
+// Filter by Employee Size
+if (selectedTags && selectedTags.length > 0) {
+  queryParams.push(...selectedTags);
+  query += ` AND lead_tagging IN (${selectedTags.map((_, i) => `$${queryParams.length - selectedTags.length + i + 1}`).join(", ")})`;
+}
+
 // Filter by company name
 if (company_name) {
   queryParams.push(`%${company_name.trim()}%`);
@@ -413,7 +427,7 @@ res.status(500).json({ success: false, message: 'Internal server error in fetchi
 async function fetchLeads1(req, res) {
   // console.log("Inside FetchLead 1");
   // Extract all filters from request body, including new location filters
-  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
+  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, selectedTags, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
 
   // Base query setup
   let query = `SELECT * FROM public.inhouse_final WHERE 1=1`;
@@ -497,6 +511,12 @@ if (selectedLevels && selectedLevels.length > 0) {
 if (selectedSizes && selectedSizes.length > 0) {
   queryParams.push(...selectedSizes);
   query += ` AND employee_size IN (${selectedSizes.map((_, i) => `$${queryParams.length - selectedSizes.length + i + 1}`).join(", ")})`;
+}
+
+// Filter by Employee Size
+if (selectedTags && selectedTags.length > 0) {
+  queryParams.push(...selectedTags);
+  query += ` AND lead_tagging IN (${selectedTags.map((_, i) => `$${queryParams.length - selectedTags.length + i + 1}`).join(", ")})`;
 }
 
 // Filter by company name
