@@ -293,11 +293,10 @@ queryParams.push(...selectedExcludedCompanies);
 query += ` AND (${selectedExcludedCompanies.map((_, i) => `company_name != $${queryParams.length - selectedExcludedCompanies.length + i + 1}`).join(" AND ")})`;
 }
 
-// Filter by included domains
+// Filter by included companies
 if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
-  query += ` AND domain IN (${selectedIncludedCompanies3.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
-  queryParams.push(...selectedIncludedCompanies3);
-  paramIndex += selectedIncludedCompanies3.length;
+queryParams.push(...selectedIncludedCompanies3);
+query += ` AND (${selectedIncludedCompanies3.map((_, i) => `domain = $${i + 1}`).join(" OR ")})`;
 }
 
 // Exclude specific companies
@@ -446,11 +445,10 @@ queryParams.push(...selectedExcludedCompanies);
 query += ` AND (${selectedExcludedCompanies.map((_, i) => `company_name != $${queryParams.length - selectedExcludedCompanies.length + i + 1}`).join(" AND ")})`;
 }
 
-// Filter by included domains
+// Filter by included companies
 if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
-  query += ` AND domain IN (${selectedIncludedCompanies3.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
-  queryParams.push(...selectedIncludedCompanies3);
-  paramIndex += selectedIncludedCompanies3.length;
+queryParams.push(...selectedIncludedCompanies3);
+query += ` AND (${selectedIncludedCompanies3.map((_, i) => `domain = $${i + 1}`).join(" OR ")})`;
 }
 
 // Exclude specific companies
