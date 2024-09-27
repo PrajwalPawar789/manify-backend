@@ -18,6 +18,7 @@ const pool = new Pool({
 
 async function login(req, res) {
     const { username, password } = req.body;
+    // console.log("Inside Local Backend")
     // Check credentials using PostgreSQL (replace with your authentication logic)
     try {
         const result = await pool.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
@@ -246,6 +247,7 @@ if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
     query += ` AND state = $${paramIndex++}`;
     queryParams.push(selectedState);
   }
+  // console.log("Inside Local Backend")
 
   // Filter by city
   if (selectedCity) {
@@ -280,6 +282,7 @@ async function fetchLeads2(req, res) {
   WHERE 1=1`;
 
   const queryParams = [];
+  let paramIndex = 1;
 
 // Filter by included companies
 if (selectedIncludedCompanies && selectedIncludedCompanies.length > 0) {
@@ -293,11 +296,12 @@ queryParams.push(...selectedExcludedCompanies);
 query += ` AND (${selectedExcludedCompanies.map((_, i) => `company_name != $${queryParams.length - selectedExcludedCompanies.length + i + 1}`).join(" AND ")})`;
 }
 
-// Filter by included companies
-if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
-queryParams.push(...selectedIncludedCompanies3);
-query += ` AND (${selectedIncludedCompanies3.map((_, i) => `domain = $${i + 1}`).join(" OR ")})`;
-}
+  // Filter by included domains
+  if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
+    query += ` AND domain IN (${selectedIncludedCompanies3.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+    queryParams.push(...selectedIncludedCompanies3);
+    paramIndex += selectedIncludedCompanies3.length;
+  }
 
 // Exclude specific companies
 if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
@@ -432,6 +436,7 @@ async function fetchLeads1(req, res) {
   // Base query setup
   let query = `SELECT * FROM public.inhouse_final WHERE 1=1`;
   const queryParams = [];
+  let paramIndex = 1;
 
 // Filter by included companies
 if (selectedIncludedCompanies && selectedIncludedCompanies.length > 0) {
@@ -445,11 +450,12 @@ queryParams.push(...selectedExcludedCompanies);
 query += ` AND (${selectedExcludedCompanies.map((_, i) => `company_name != $${queryParams.length - selectedExcludedCompanies.length + i + 1}`).join(" AND ")})`;
 }
 
-// Filter by included companies
-if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
-queryParams.push(...selectedIncludedCompanies3);
-query += ` AND (${selectedIncludedCompanies3.map((_, i) => `domain = $${i + 1}`).join(" OR ")})`;
-}
+  // Filter by included domains
+  if (selectedIncludedCompanies3 && selectedIncludedCompanies3.length > 0) {
+    query += ` AND domain IN (${selectedIncludedCompanies3.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+    queryParams.push(...selectedIncludedCompanies3);
+    paramIndex += selectedIncludedCompanies3.length;
+  }
 
 // Exclude specific companies
 if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
