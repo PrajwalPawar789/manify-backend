@@ -113,7 +113,10 @@ async function fetchLeads(req, res) {
     selectedIncludedCompanies,
     selectedExcludedCompanies,
     selectedIncludedCompanies3,
-    selectedIncludedCompanies4
+    selectedIncludedCompanies4,
+    selectedClientCodes,
+    selectedClients
+
   } = req.body;
 
   let query = `
@@ -129,6 +132,20 @@ async function fetchLeads(req, res) {
     query += ` AND (${selectedIncludedCompanies.map((_, idx) => `company_name = $${paramIndex + idx}`).join(" OR ")})`;
     queryParams.push(...selectedIncludedCompanies);
     paramIndex += selectedIncludedCompanies.length;
+  }
+
+  // Filter by client codes
+  if (selectedClientCodes && selectedClientCodes.length > 0) {
+    query += ` AND client_code IN (${selectedClientCodes.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+    queryParams.push(...selectedClientCodes);
+    paramIndex += selectedClientCodes.length;
+  }
+
+  // Filter by client codes
+  if (selectedClients && selectedClients.length > 0) {
+    query += ` AND msft_non_msft IN (${selectedClients.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+    queryParams.push(...selectedClients);
+    paramIndex += selectedClients.length;
   }
 
   // Exclude specific companies
@@ -255,6 +272,7 @@ if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
     queryParams.push(selectedCity);
   }
 
+
   try {
     const { rows } = await pool.query(query, queryParams);
     res.json({
@@ -273,7 +291,7 @@ if (selectedIncludedCompanies4 && selectedIncludedCompanies4.length > 0) {
 
 async function fetchLeads2(req, res) {
   // Extract all filters from request body, including new location filters
-  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, selectedTags, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
+  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, selectedTags, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4, selectedClientCodes, selectedClients} = req.body;
 
   // Base query setup
   let query = `
@@ -294,6 +312,20 @@ query += ` AND (${selectedIncludedCompanies.map((_, i) => `company_name = $${i +
 if (selectedExcludedCompanies && selectedExcludedCompanies.length > 0) {
 queryParams.push(...selectedExcludedCompanies);
 query += ` AND (${selectedExcludedCompanies.map((_, i) => `company_name != $${queryParams.length - selectedExcludedCompanies.length + i + 1}`).join(" AND ")})`;
+}
+
+// Filter by client codes
+if (selectedClientCodes && selectedClientCodes.length > 0) {
+  query += ` AND client_code IN (${selectedClientCodes.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+  queryParams.push(...selectedClientCodes);
+  paramIndex += selectedClientCodes.length;
+}
+
+// Filter by client codes
+if (selectedClients && selectedClients.length > 0) {
+  query += ` AND msft_non_msft IN (${selectedClients.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+  queryParams.push(...selectedClients);
+  paramIndex += selectedClients.length;
 }
 
   // Filter by included domains
@@ -431,7 +463,7 @@ res.status(500).json({ success: false, message: 'Internal server error in fetchi
 async function fetchLeads1(req, res) {
   // console.log("Inside FetchLead 1");
   // Extract all filters from request body, including new location filters
-  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, selectedTags, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4 } = req.body;
+  const { selectedIndustries, selectedSubIndustries, selectedTitles, selectedTitles1, selectedTitles3, selectedTitles4, selectedLevels, selectedFunctions, selectedSizes, selectedTags, company_name, selectedCountry, selectedRegion, selectedState, selectedCity, selectedIncludedCompanies, selectedExcludedCompanies, selectedIncludedCompanies3, selectedIncludedCompanies4, selectedClientCodes , selectedClients } = req.body;
 
   // Base query setup
   let query = `SELECT * FROM public.inhouse_final WHERE 1=1`;
@@ -448,6 +480,20 @@ query += ` AND (${selectedIncludedCompanies.map((_, i) => `company_name = $${i +
 if (selectedExcludedCompanies && selectedExcludedCompanies.length > 0) {
 queryParams.push(...selectedExcludedCompanies);
 query += ` AND (${selectedExcludedCompanies.map((_, i) => `company_name != $${queryParams.length - selectedExcludedCompanies.length + i + 1}`).join(" AND ")})`;
+}
+
+// Filter by client codes
+if (selectedClientCodes && selectedClientCodes.length > 0) {
+  query += ` AND client_code IN (${selectedClientCodes.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+  queryParams.push(...selectedClientCodes);
+  paramIndex += selectedClientCodes.length;
+}
+
+// Filter by client codes
+if (selectedClients && selectedClients.length > 0) {
+  query += ` AND msft_non_msft IN (${selectedClients.map((_, idx) => `$${paramIndex + idx}`).join(", ")})`;
+  queryParams.push(...selectedClients);
+  paramIndex += selectedClients.length;
 }
 
   // Filter by included domains
