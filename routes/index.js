@@ -27,5 +27,6 @@ router.get('/databasecount', userController.databasecount);
 
 router.get('/prospectDetails/:sr_no', userController.fetchProspectDetails);
 router.get('/userPlanDetails/:userId', userController.fetchUserPlanDetails);
+router.post('/logCampaignData', userController.insertCampaignLog); // Add authentication if needed
 
 module.exports = router;
